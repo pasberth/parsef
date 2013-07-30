@@ -109,36 +109,24 @@ int main(int argc, char const *argv[])
     x = 0;
     i = 0;
 
-    if (fml->type == Str ) {
+    if ( ! newlined[y] )
+      while (1) {
+        ch = getchar_from_stdin();
 
-      if ( ! newlined[y] )
-        while (1) {
-          ch = getchar_from_stdin();
+        if (ch == '\n')
+          break;
+        else if (ch == EOF)
+          return 0;
+      }
 
-          if (ch == '\n')
-            break;
-          else if (ch == EOF)
-            return 0;
-        }
-
+    if ( fml->type == Str ) {
       if ( strcmp(buffer[y], fml->str) ) {
         fml = formula;
         retry();
         continue;
       }
-    } else if ( fml->type == Var ) {
-      if ( ! newlined[y] )
-        while (1) {
-          ch = getchar_from_stdin();
-
-          if (ch == '\n')
-            break;
-          else if (ch == EOF)
-            return 0;
-        }
-
+    } else if ( fml->type == Var )
       variables[fml->idx] = buffer[y];
-    }
 
     fml = fml->next;
     incr_y();
