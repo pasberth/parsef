@@ -59,7 +59,18 @@ static inline void retry() {
   y = yfirst;
 }
 
-static inline void finish() {
+static inline void finish_finally() {
+  for (int j = 0; j < YLEN; ++j)
+  {
+    buffered[j] = 0;
+    buffer[j][0] = '\0';
+  }
+
+  y      = 0;
+  yfirst = 0;
+}
+
+static inline void finish_failure() {
   for (int j = 0; j < YLEN; ++j)
   {
     if (buffered[yfirst])
@@ -68,6 +79,8 @@ static inline void finish() {
       printf ("%s", buffer[yfirst]);
     incr_yfirst();
   }
+
+  finish_finally();
 }
 
 static inline void finish_success(const struct Format *format) {
@@ -82,14 +95,7 @@ static inline void finish_success(const struct Format *format) {
   }
   printf ("\n");
 
-  for (int j = 0; j < YLEN; ++j)
-  {
-    buffered[j] = 0;
-    buffer[j][0] = '\0';
-  }
-
-  y      = 0;
-  yfirst = 0;
+  finish_finally();
 }
 
 static inline char getchar_from_stdin() {
@@ -100,7 +106,7 @@ static inline char getchar_from_stdin() {
     buffered[y] = 1;
   } else if (ch == EOF) {
     buffer[y][x] = '\0';
-    finish();
+    finish_failure();
   } else {
     buffer[y][x] = ch;
     ++x;
