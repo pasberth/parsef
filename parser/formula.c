@@ -104,31 +104,6 @@ int main(int argc, char const *argv[])
   const struct Format *fml = formula;
 
   while (1) {
-
-    x = 0;
-
-    if ( ! buffered[y] )
-      while (1) {
-        ch = getchar_from_stdin();
-
-        if (ch == '\n')
-          break;
-        else if (ch == EOF)
-          return 0;
-      }
-
-    if ( fml->type == Str ) {
-      if ( strcmp(buffer[y], fml->str) ) {
-        fml = formula;
-        retry();
-        continue;
-      }
-    } else if ( fml->type == Var )
-      variables[fml->idx] = buffer[y];
-
-    fml = fml->next;
-    incr_y();
-
     if (! fml) {
       fml = formula;
 
@@ -153,7 +128,32 @@ int main(int argc, char const *argv[])
 
       y      = 0;
       yfirst = 0;
+      continue;
     }
+
+    x = 0;
+
+    if ( ! buffered[y] )
+      while (1) {
+        ch = getchar_from_stdin();
+
+        if (ch == '\n')
+          break;
+        else if (ch == EOF)
+          return 0;
+      }
+
+    if ( fml->type == Str ) {
+      if ( strcmp(buffer[y], fml->str) ) {
+        fml = formula;
+        retry();
+        continue;
+      }
+    } else if ( fml->type == Var )
+      variables[fml->idx] = buffer[y];
+
+    fml = fml->next;
+    incr_y();
   }
 
   return 0;
