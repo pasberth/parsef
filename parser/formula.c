@@ -121,33 +121,19 @@ int main(int argc, char const *argv[])
     x = 0;
     i = 0;
 
-    if (fml->type == Str && ! newlined[y] ) {
-    
-      while (1) {
-        ch = getchar_from_stdin();
+    if (fml->type == Str ) {
 
-        if (ch == '\n')
-          break;
-        else if (ch == EOF)
-          return 0;
-        else if (fml->str[i] && fml->str[i] == ch)
-          ++i;
-      }
+      if ( ! newlined[y] )
+        while (1) {
+          ch = getchar_from_stdin();
 
-      if (i != x || fml->str[i]) {
-        fml = formula;
-        retry();
-        continue;
-      }
-    } else if (fml->type == Str && newlined[y] ) {
-      while ( buffer[y][x] ) {
-        ch = buffer[y][x];
-        ++x;
-        if (fml->str[i] && fml->str[i] == ch)
-          ++i;
-      }
+          if (ch == '\n')
+            break;
+          else if (ch == EOF)
+            return 0;
+        }
 
-      if (i != x || fml->str[i]) {
+      if ( strcmp(buffer[y], fml->str) ) {
         fml = formula;
         retry();
         continue;
