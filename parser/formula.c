@@ -70,6 +70,28 @@ static inline void finish() {
   }
 }
 
+static inline void finish_success(const struct Format *format) {
+  while (format) {
+    if (format->type == Str) {
+      printf ("%s", format->str);
+    } else if (format->type == Var && variables[format->idx]) {
+      printf ("%s", variables[format->idx]);
+    }
+
+    format = format->next;
+  }
+  printf ("\n");
+
+  for (int j = 0; j < YLEN; ++j)
+  {
+    buffered[j] = 0;
+    buffer[j][0] = '\0';
+  }
+
+  y      = 0;
+  yfirst = 0;
+}
+
 static inline char getchar_from_stdin() {
   ch = getchar();
 
@@ -106,28 +128,7 @@ int main(int argc, char const *argv[])
   while (1) {
     if (! fml) {
       fml = formula;
-
-      const struct Format *fmt = format;
-
-      while (fmt) {
-        if (fmt->type == Str) {
-          printf ("%s", fmt->str);
-        } else if (fmt->type == Var && variables[fmt->idx]) {
-          printf ("%s", variables[fmt->idx]);
-        }
-
-        fmt = fmt->next;
-      }
-      printf ("\n");
-
-      for (int j = 0; j < YLEN; ++j)
-      {
-        buffered[j] = 0;
-        buffer[j][0] = '\0';
-      }
-
-      y      = 0;
-      yfirst = 0;
+      finish_success(format);
       continue;
     }
 
