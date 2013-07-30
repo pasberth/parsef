@@ -71,6 +71,35 @@ static inline void finish() {
   }
 }
 
+static inline char getchar_from_stdin() {
+  ch = getchar();
+
+  if (ch == '\n') {
+    buffer[y][x] = '\0';
+    newlined[y] = 1;
+  } else if (ch == EOF) {
+    buffer[y][x] = '\0';
+    finish();
+  } else {
+    buffer[y][x] = ch;
+    ++x;
+  }
+
+  return ch;
+}
+
+static inline char getchar_and_store_var(int idx) {
+  char ch = getchar_from_stdin();
+
+  if (ch == '\n' || ch == EOF)
+    variables[idx][x] = '\0'; /* x will be not incremented. */
+  else
+    variables[idx][x-1] = ch; /* x will be incremented by getchar_from_stdin(). */
+
+  return ch;
+}
+
+
 int main(int argc, char const *argv[])
 {
   const char *FORMULAV = getenv("FORMULAV");
@@ -95,22 +124,13 @@ int main(int argc, char const *argv[])
     if (fml->type == Str && ! newlined[y] ) {
     
       while (1) {
-        ch = getchar();
+        ch = getchar_from_stdin();
 
-        if (ch == '\n') {
-          buffer[y][x] = '\0';
+        if (ch == '\n')
           break;
-        } else if (ch == EOF) {
-          buffer[y][x] = '\0';
-          finish();
-
+        else if (ch == EOF)
           return 0;
-        } else {
-          buffer[y][x] = ch;
-          ++x;
-        }
-
-        if (fml->str[i] && fml->str[i] == ch)
+        else if (fml->str[i] && fml->str[i] == ch)
           ++i;
       }
 
@@ -136,26 +156,13 @@ int main(int argc, char const *argv[])
       }
     } else if (fml->type == Var && ! newlined[y] ) {
       while (1) {
-        ch = getchar();
+        ch = getchar_and_store_var(fml->idx);
 
-        if (ch == '\n') {
-          buffer[y][x] = '\0';
-          variables[fml->idx][x] = '\0';
+        if (ch == '\n')
           break;
-        } else if (ch == EOF) {
-          buffer[y][x] = '\0';
-          variables[fml->idx][x] = '\0';
-          finish();
-
+        else if (ch == EOF)
           return 0;
-        } else {
-          buffer[y][x] = ch;
-          variables[fml->idx][x] = ch;
-          ++x;
-        }
       }
-
-      newlined[y] = 1;
     } else if (fml->type == Var && newlined[y] ) {
       while ( buffer[y][x] ) {
         variables[fml->idx][x] = buffer[y][x];
