@@ -1,0 +1,17 @@
+CFLAGS += -Wall -O3 -std=c11
+
+CProgram(formula, formula)
+
+$(BIN)/formula: formula
+  mkdir -p $(BIN)
+  install formula $(BIN)
+
+$(BIN)/foldr: foldr.hs
+  mkdir -p $(BIN)
+  $(HC) -O2 foldr.hs -o $(BIN)/foldr
+
+$(BIN)/between: between.zsh
+  mkdir -p $(BIN)
+  install between.zsh $(BIN)/between
+
+install: $(BIN)/formula $(BIN)/foldr $(BIN)/between
