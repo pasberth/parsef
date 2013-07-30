@@ -134,8 +134,6 @@ int main(int argc, char const *argv[])
           ++i;
       }
 
-      newlined[y] = 1;
-
       if (i != x || fml->str[i]) {
         fml = formula;
         retry();
