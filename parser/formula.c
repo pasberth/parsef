@@ -35,7 +35,6 @@ static char ch;
 static int yfirst = 0;
 static int y = 0;
 static int x = 0;
-static int i = 0;
 
 static inline void incr_yfirst() {
   if (yfirst + 1 < YLEN)
@@ -107,7 +106,6 @@ int main(int argc, char const *argv[])
   while (1) {
 
     x = 0;
-    i = 0;
 
     if ( ! newlined[y] )
       while (1) {
