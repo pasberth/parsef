@@ -29,7 +29,7 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
 
 static char newlined[YLEN];
 static char buffer[YLEN][XLEN];
-static char variables[YLEN][XLEN];
+static char *variables[YLEN];
 
 static char ch;
 static int yfirst = 0;
@@ -88,18 +88,6 @@ static inline char getchar_from_stdin() {
   return ch;
 }
 
-static inline char getchar_and_store_var(int idx) {
-  char ch = getchar_from_stdin();
-
-  if (ch == '\n' || ch == EOF)
-    variables[idx][x] = '\0'; /* x will be not incremented. */
-  else
-    variables[idx][x-1] = ch; /* x will be incremented by getchar_from_stdin(). */
-
-  return ch;
-}
-
-
 int main(int argc, char const *argv[])
 {
   const char *FORMULAV = getenv("FORMULAV");
@@ -138,21 +126,18 @@ int main(int argc, char const *argv[])
         retry();
         continue;
       }
-    } else if (fml->type == Var && ! newlined[y] ) {
-      while (1) {
-        ch = getchar_and_store_var(fml->idx);
+    } else if ( fml->type == Var ) {
+      if ( ! newlined[y] )
+        while (1) {
+          ch = getchar_from_stdin();
 
-        if (ch == '\n')
-          break;
-        else if (ch == EOF)
-          return 0;
-      }
-    } else if (fml->type == Var && newlined[y] ) {
-      while ( buffer[y][x] ) {
-        variables[fml->idx][x] = buffer[y][x];
-        ++x;
-      }
-      variables[fml->idx][x] = '\0';
+          if (ch == '\n')
+            break;
+          else if (ch == EOF)
+            return 0;
+        }
+
+      variables[fml->idx] = buffer[y];
     }
 
     fml = fml->next;
@@ -178,7 +163,6 @@ int main(int argc, char const *argv[])
       {
         newlined[j] = 0;
         buffer[j][0] = '\0';
-        variables[j][0] = '\0';
       }
 
       y      = 0;
