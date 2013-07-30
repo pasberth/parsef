@@ -24,11 +24,12 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
  *   Main program
  * ================================================================================ */
 
-#define LENGTH 256
+#define YLEN 256
+#define XLEN 2048
 
-static char newlined[LENGTH];
-static char buffer[LENGTH][2048];
-static char variables[LENGTH][2048];
+static char newlined[YLEN];
+static char buffer[YLEN][XLEN];
+static char variables[YLEN][XLEN];
 
 static char ch;
 static int yfirst = 0;
@@ -37,14 +38,14 @@ static int x = 0;
 static int i = 0;
 
 static inline void incr_yfirst() {
-  if (yfirst + 1 < LENGTH)
+  if (yfirst + 1 < YLEN)
     ++yfirst;
   else
     yfirst = 0;
 }
 
 static inline void incr_y() {
-  if (y + 1 < LENGTH)
+  if (y + 1 < YLEN)
     ++y;
   else
     y = 0;
@@ -60,7 +61,7 @@ static inline void retry() {
 }
 
 static inline void finish() {
-  for (int j = 0; j < LENGTH; ++j)
+  for (int j = 0; j < YLEN; ++j)
   {
     if (newlined[yfirst])
       printf ("%s\n", buffer[yfirst]);
@@ -76,7 +77,7 @@ int main(int argc, char const *argv[])
 
   if ( argc <= 1 ||  FORMULAV == 0 )
     return 1;
-  if ( argc - 2 >= LENGTH)
+  if ( argc - 2 >= YLEN)
     return 1;
 
   const int formulavlen = flvlen(FORMULAV);
@@ -182,7 +183,7 @@ int main(int argc, char const *argv[])
       }
       printf ("\n");
 
-      for (int j = 0; j < LENGTH; ++j)
+      for (int j = 0; j < YLEN; ++j)
       {
         newlined[j] = 0;
         buffer[j][0] = '\0';
