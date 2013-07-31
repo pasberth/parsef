@@ -26,6 +26,6 @@ main = do
     Just command -> do
       let exeproc  = readProcess command cmdargs
 
-      r <- foldrM (\l b -> if l `F.elem` sepmarks' then (\b -> l : lines b) <$> exeproc (unlines b) else return (l:b)) [] (lines contents)
+      r <- foldrM (\l b -> if l `F.elem` sepmarks' then (l :) . lines <$> exeproc (unlines b) else return (l:b)) [] (lines contents)
       r <- exeproc (unlines r)
       putStr r
