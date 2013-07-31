@@ -2,16 +2,28 @@ CFLAGS += -Wall -O4 -std=c11
 
 CProgram(formula, formula)
 
-$(BIN)/formula: formula
-  mkdir -p $(BIN)
-  install formula $(BIN)
+../bin/formula: ../bin formula
+  install formula ../bin/formula
 
-$(BIN)/foldr: foldr.hs
-  mkdir -p $(BIN)
-  $(HC) -O2 foldr.hs -o $(BIN)/foldr
+../bin/foldr: ../bin foldr.hs
+  $(HC) -O2 foldr.hs -o ../bin/foldr
 
-$(BIN)/between: between.zsh
-  mkdir -p $(BIN)
-  install between.zsh $(BIN)/between
+../bin/between: ../bin between.zsh
+  install between.zsh ../bin/between
 
-install: $(BIN)/formula $(BIN)/foldr $(BIN)/between
+build: ../bin/formula ../bin/foldr ../bin/between
+
+clean:
+  rm -f formula
+  rm -f *.hi *.o
+  rm -f ../bin/formula ../bin/foldr ../bin/between
+
+install: build $(BIN)
+  install ../bin/formula $(BIN)/formula
+  install ../bin/foldr $(BIN)/foldr
+  install ../bin/between $(BIN)/between
+
+uninstall:
+  rm -f $(BIN)/formula
+  rm -f $(BIN)/foldr
+  rm -f $(BIN)/between

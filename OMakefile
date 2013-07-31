@@ -1,6 +1,13 @@
-.PHONY: all install clean test
+.PHONY: all build clean install uninstall test
+
+bin:
+  mkdir -p bin
+
+all: build test
+
+test: build
+  rspec
+
+.DEFAULT: all
 
 .SUBDIRS: lexer parser
-
-test:
-  rspec

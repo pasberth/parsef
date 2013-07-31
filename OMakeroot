@@ -6,8 +6,12 @@ CC = clang
 HC = ghc
 
 PREFIX = .
-BIN = $(absname $(PREFIX)/bin)
 
 DefineCommandVars()
+
+BIN = $(absname $(PREFIX)/bin)
+
+$(BIN):
+  mkdir -p $(BIN)
 
 .SUBDIRS: .

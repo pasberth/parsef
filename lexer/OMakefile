@@ -1,9 +1,18 @@
-$(BIN)/split-on-spaces: split-on-spaces.sed
-  mkdir -p $(BIN)
-  install split-on-spaces.sed $(BIN)/split-on-spaces
+../bin/split-on-spaces: ../bin split-on-spaces.sed
+  install split-on-spaces.sed ../bin/split-on-spaces
 
-$(BIN)/split-in-punctuation: split-in-punctuation.pl
-  mkdir -p $(BIN)
-  install split-in-punctuation.pl $(BIN)/split-in-punctuation
+../bin/split-in-punctuation: ../bin split-in-punctuation.pl
+  install split-in-punctuation.pl ../bin/split-in-punctuation
 
-install: $(BIN)/split-on-spaces $(BIN)/split-in-punctuation
+build: ../bin/split-on-spaces ../bin/split-in-punctuation
+
+clean:
+  rm -f ../bin/split-on-spaces ../bin/split-in-punctuation
+
+install: build $(BIN)
+  install ../bin/split-on-spaces $(BIN)/split-on-spaces
+  install ../bin/split-in-punctuation $(BIN)/split-in-punctuation
+
+uninstall:
+  rm -f $(BIN)/split-on-spaces
+  rm -f $(BIN)/split-in-punctuation
