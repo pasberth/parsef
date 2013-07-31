@@ -130,7 +130,7 @@ int main(int argc, char const *argv[])
         return 0;
       } else {
 
-        int x = 0; /* '\n' */
+        int x = 0; /* Index of '\n' */
         while ( line[x] && line[x] != '\n' )
           ++x;
 
