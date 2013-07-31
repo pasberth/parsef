@@ -24,11 +24,9 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
  *   Main program
  * ================================================================================ */
 
-#define YLEN 256
-
-static char *buffer[YLEN];
-static char *variables[YLEN];
-
+static int YLEN;
+static char **buffer;
+static char **variables;
 static int yfirst = 0;
 static int y = 0;
 
@@ -102,14 +100,15 @@ int main(int argc, char const *argv[])
 
   if ( argc <= 1 ||  FORMULAV == 0 )
     return 1;
-  if ( argc - 2 >= YLEN)
-    return 1;
+  YLEN = argc - 2;
+  buffer    = calloc(sizeof(char *), YLEN);
+  variables = calloc(sizeof(char *), YLEN);
 
   const int formulavlen = flvlen(FORMULAV);
   const char **formulav = flvsep(FORMULAV);
 
   const struct Format *format = fmtparse(formulavlen, formulav, argv[1]);
-  const struct Format *formula = fmlparse(formulavlen, formulav, argc - 2, argv + 2);
+  const struct Format *formula = fmlparse(formulavlen, formulav, YLEN, argv + 2);
   const struct Format *fml = formula;
 
   char *line;
@@ -124,6 +123,7 @@ int main(int argc, char const *argv[])
     }
 
     if ( ! buffer[y] ) {
+
       if ( getline( &line, &len, stdin ) == -1 ) {
         finish_failure();
         printf( "%s", line );
