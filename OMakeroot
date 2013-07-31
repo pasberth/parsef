@@ -2,6 +2,12 @@ open build/C
 open build/OCaml
 open build/LaTeX
 
+CC = clang
+HC = ghc
+
+PREFIX = .
+BIN = $(absname $(PREFIX)/bin)
+
 DefineCommandVars()
 
 .SUBDIRS: .

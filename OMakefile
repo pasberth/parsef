@@ -1,7 +1,6 @@
-CC = clang
-HC = ghc
-BIN = $(absname bin)
-
-.PHONY: all install clean
+.PHONY: all install clean test
 
 .SUBDIRS: lexer parser
+
+test:
+  rspec
