@@ -100,15 +100,19 @@ int main(int argc, char const *argv[])
 
   if ( argc <= 1 ||  FORMULAV == 0 )
     return 1;
-  BUFSIZE = argc - 2;
+
+  const char *FORMAT   = argv[1];
+  const char **FORMULA = argv + 2;
+
+  BUFSIZE   = argc - 2;
   buffer    = calloc(sizeof(char *), BUFSIZE);
   variables = calloc(sizeof(char *), BUFSIZE);
 
   const int formulavlen = flvlen(FORMULAV);
   const char **formulav = flvsep(FORMULAV);
 
-  const struct Format *format = fmtparse(formulavlen, formulav, argv[1]);
-  const struct Format *formula = fmlparse(formulavlen, formulav, BUFSIZE, argv + 2);
+  const struct Format *format = fmtparse(formulavlen, formulav, FORMAT);
+  const struct Format *formula = fmlparse(formulavlen, formulav, BUFSIZE, FORMULA);
   const struct Format *fml = formula;
 
   char *line;
