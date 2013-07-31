@@ -130,7 +130,6 @@ int main(int argc, char const *argv[])
 
       if ( getline( &line, &len, stdin ) == -1 ) {
         finish_failure();
-        printf( "%s", line );
         return 0;
       } else {
 
