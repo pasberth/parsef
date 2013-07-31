@@ -26,6 +26,7 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
 
 static int BUFSIZE;
 static char **buffer;
+static char *buffered;
 static char **variables;
 static int BUFTOP = 0;
 static int bufptr = 0;
@@ -45,17 +46,17 @@ static inline void incr_bufptr() {
 }
 
 static inline void finish_line () {
-  if ( ! buffer[BUFTOP] )
+  if ( ! buffered[BUFTOP] )
     return;
 
-  free ( buffer[BUFTOP] );
-  buffer[BUFTOP] = NULL;
+  buffer[BUFTOP][0] = '\0';
+  buffered[BUFTOP] = 0;
 
   incr_BUFTOP();
 }
 
 static inline void retry() {
-  if ( ! buffer[BUFTOP] )
+  if ( ! buffered[BUFTOP] )
     return;
 
   printf ( "%s\n", buffer[BUFTOP] );
@@ -106,6 +107,7 @@ int main(int argc, char const *argv[])
 
   BUFSIZE   = argc - 2;
   buffer    = calloc(sizeof(char *), BUFSIZE);
+  buffered  = calloc(sizeof(char), BUFSIZE);
   variables = calloc(sizeof(char *), BUFSIZE);
 
   const int formulavlen = flvlen(FORMULAV);
@@ -126,7 +128,7 @@ int main(int argc, char const *argv[])
       continue;
     }
 
-    if ( ! buffer[bufptr] ) {
+    if ( ! buffered[bufptr] ) {
 
       if ( getline( &line, &len, stdin ) == -1 ) {
         finish_failure();
@@ -146,9 +148,10 @@ int main(int argc, char const *argv[])
           return 0;
         }
 
-        buffer[bufptr] = malloc(sizeof(char) * x);
+        buffer[bufptr] = realloc(buffer[bufptr], sizeof(char) * (x + 1));
         memcpy( buffer[bufptr], line, x );
         buffer[bufptr][x] = '\0';
+        buffered[bufptr] = 1;
       }
     }
 
