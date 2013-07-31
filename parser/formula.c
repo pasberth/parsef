@@ -24,21 +24,21 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
  *   Main program
  * ================================================================================ */
 
-static int YLEN;
+static int BUFSIZE;
 static char **buffer;
 static char **variables;
 static int yfirst = 0;
 static int y = 0;
 
 static inline void incr_yfirst() {
-  if (yfirst + 1 < YLEN)
+  if (yfirst + 1 < BUFSIZE)
     ++yfirst;
   else
     yfirst = 0;
 }
 
 static inline void incr_y() {
-  if (y + 1 < YLEN)
+  if (y + 1 < BUFSIZE)
     ++y;
   else
     y = 0;
@@ -69,7 +69,7 @@ static inline void finish_finally() {
 }
 
 static inline void finish_failure() {
-  for (int j = 0; j < YLEN; ++j)
+  for (int j = 0; j < BUFSIZE; ++j)
     retry();
 
   finish_finally();
@@ -88,7 +88,7 @@ static inline void finish_success(const struct Format *format) {
 
   putchar ('\n');
 
-  for (int j = 0; j < YLEN; ++j)
+  for (int j = 0; j < BUFSIZE; ++j)
     finish_line();
 
   finish_finally();
@@ -100,15 +100,15 @@ int main(int argc, char const *argv[])
 
   if ( argc <= 1 ||  FORMULAV == 0 )
     return 1;
-  YLEN = argc - 2;
-  buffer    = calloc(sizeof(char *), YLEN);
-  variables = calloc(sizeof(char *), YLEN);
+  BUFSIZE = argc - 2;
+  buffer    = calloc(sizeof(char *), BUFSIZE);
+  variables = calloc(sizeof(char *), BUFSIZE);
 
   const int formulavlen = flvlen(FORMULAV);
   const char **formulav = flvsep(FORMULAV);
 
   const struct Format *format = fmtparse(formulavlen, formulav, argv[1]);
-  const struct Format *formula = fmlparse(formulavlen, formulav, YLEN, argv + 2);
+  const struct Format *formula = fmlparse(formulavlen, formulav, BUFSIZE, argv + 2);
   const struct Format *fml = formula;
 
   char *line;
