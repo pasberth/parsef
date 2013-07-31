@@ -6,6 +6,7 @@ bin:
 all: build test
 
 test: build
+  setenv(PATH, bin:$(concat ":", PATH))
   rspec
 
 .DEFAULT: all
