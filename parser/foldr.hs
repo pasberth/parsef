@@ -1,3 +1,4 @@
+import Control.Arrow
 import Control.Applicative
 import Data.Foldable as F
 import System.Exit
@@ -24,8 +25,8 @@ main = do
   case commandName args of
     Nothing -> exitFailure
     Just command -> do
-      let exeproc  = readProcess command cmdargs
+      let exeproc = readProcess command cmdargs
+      let f l | l `F.elem` sepmarks' = unlines >>> exeproc >>> fmap ((l :) . lines)
+              | otherwise            = return . (l:)
 
-      r <- foldrM (\l b -> if l `F.elem` sepmarks' then (l :) . lines <$> exeproc (unlines b) else return (l:b)) [] (lines contents)
-      r <- exeproc (unlines r)
-      putStr r
+      putStr =<< exeproc . unlines =<< foldrM f [] (lines contents)
