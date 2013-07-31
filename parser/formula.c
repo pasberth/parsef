@@ -27,45 +27,45 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
 static int BUFSIZE;
 static char **buffer;
 static char **variables;
-static int yfirst = 0;
-static int y = 0;
+static int BUFTOP = 0;
+static int bufptr = 0;
 
-static inline void incr_yfirst() {
-  if (yfirst + 1 < BUFSIZE)
-    ++yfirst;
+static inline void incr_BUFTOP() {
+  if (BUFTOP + 1 < BUFSIZE)
+    ++BUFTOP;
   else
-    yfirst = 0;
+    BUFTOP = 0;
 }
 
-static inline void incr_y() {
-  if (y + 1 < BUFSIZE)
-    ++y;
+static inline void incr_bufptr() {
+  if (bufptr + 1 < BUFSIZE)
+    ++bufptr;
   else
-    y = 0;
+    bufptr = 0;
 }
 
 static inline void finish_line () {
-  if ( ! buffer[yfirst] )
+  if ( ! buffer[BUFTOP] )
     return;
 
-  free ( buffer[yfirst] );
-  buffer[yfirst] = NULL;
+  free ( buffer[BUFTOP] );
+  buffer[BUFTOP] = NULL;
 
-  incr_yfirst();
+  incr_BUFTOP();
 }
 
 static inline void retry() {
-  if ( ! buffer[yfirst] )
+  if ( ! buffer[BUFTOP] )
     return;
 
-  printf ( "%s\n", buffer[yfirst] );
+  printf ( "%s\n", buffer[BUFTOP] );
   finish_line();
-  y = yfirst;
+  bufptr = BUFTOP;
 }
 
 static inline void finish_finally() {
-  y      = 0;
-  yfirst = 0;
+  bufptr = 0;
+  BUFTOP = 0;
 }
 
 static inline void finish_failure() {
@@ -122,7 +122,7 @@ int main(int argc, char const *argv[])
       continue;
     }
 
-    if ( ! buffer[y] ) {
+    if ( ! buffer[bufptr] ) {
 
       if ( getline( &line, &len, stdin ) == -1 ) {
         finish_failure();
@@ -134,23 +134,23 @@ int main(int argc, char const *argv[])
         while ( line[x] && line[x] != '\n' )
           ++x;
 
-        buffer[y] = malloc(sizeof(char) * x);
-        memcpy( buffer[y], line, x );
-        buffer[y][x] = '\0';
+        buffer[bufptr] = malloc(sizeof(char) * x);
+        memcpy( buffer[bufptr], line, x );
+        buffer[bufptr][x] = '\0';
       }
     }
 
     if ( fml->type == Str ) {
-      if ( strcmp(buffer[y], fml->str) ) {
+      if ( strcmp(buffer[bufptr], fml->str) ) {
         fml = formula;
         retry();
         continue;
       }
     } else if ( fml->type == Var )
-      variables[fml->idx] = buffer[y];
+      variables[fml->idx] = buffer[bufptr];
 
     fml = fml->next;
-    incr_y();
+    incr_bufptr();
   }
 
   return 0;
