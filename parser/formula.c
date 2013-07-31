@@ -7,7 +7,7 @@ enum FormatType { Str, Var };
 
 struct Format {
   enum FormatType type;
-  struct Format *next;
+  const struct Format *next;
   union {
     const char *str;
     int idx;
@@ -296,7 +296,7 @@ static const struct Format *fmtparse(int formulavlen, const char **formulav, con
         ret = fmt;
 
       if ( prev ) {
-        prev->next = fmt;
+        prev->next = (const struct Format *) fmt;
         prev = fmt;
       } else {
         prev = fmt;
@@ -312,7 +312,7 @@ static const struct Format *fmtparse(int formulavlen, const char **formulav, con
       ret = fmt;
 
     if ( prev ) {
-      prev->next = fmt;
+      prev->next = (const struct Format *) fmt;
       prev = fmt;
     } else {
       prev = fmt;
@@ -335,7 +335,7 @@ static const struct Format *fmtparse(int formulavlen, const char **formulav, con
       ret = fmt;
 
     if ( prev ) {
-      prev->next = fmt;
+      prev->next = (const struct Format *) fmt;
       prev = fmt;
     } else {
       prev = fmt;
@@ -363,7 +363,7 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
       ret = fmt;
 
     if ( prev ) {
-      prev->next = fmt;
+      prev->next = (const struct Format *) fmt;
       prev = fmt;
     } else {
       prev = fmt;
