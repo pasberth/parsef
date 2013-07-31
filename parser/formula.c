@@ -154,29 +154,31 @@ int main(int argc, char const *argv[])
           return 0;
         }
 
-        char *buf;
+        char *buf;        /* Buffer that will store the line. */
+        int len = x;      /* length of the buffer excluding '\0' character. */
+        int len0 = x + 1; /* length of the buffer containing '\0' character. */
 
-        if ( bufptr < STATIC_BUFFER_YSIZE && x + 1 < STATIC_BUFFER_XSIZE ) {
+        if ( bufptr < STATIC_BUFFER_YSIZE && len0 < STATIC_BUFFER_XSIZE ) {
           if ( ! static_buffered[bufptr] )
             /* If buffer[y] is heap, I must free the heap. */
             free ( buffer[bufptr] );
             /* If buffer[y] is stack, I should fill up the buffer with 0
-              * but I don't, because now I'm no need. */
+             * but I don't, because now I'm no need. */
 
           buf = static_buffer[bufptr];
           static_buffered[bufptr] = 1;
         } else {
-          if ( static_buffered[bufptr] )
+          if ( bufptr < STATIC_BUFFER_YSIZE && static_buffered[bufptr] )
             /* If buffer[y] is stack, I can't use realloc() but I need to allocate a new heap. */
-            buf = malloc(sizeof(char) * (x + 1));
+            buf = malloc(sizeof(char) * len0);
           else
             /* If buffer[y] is heap, I reallocate the heap by realloc(). */
-            buf = realloc(buffer[bufptr], sizeof(char) * (x + 1));
+            buf = realloc(buffer[bufptr], sizeof(char) * len0);
 
           static_buffered[bufptr] = 0;
         }
 
-        memcpy( buf, line, x );
+        memcpy( buf, line, len );
         buf[x] = '\0';
         buffer[bufptr] = buf;
         buffered[bufptr] = 1;
