@@ -137,6 +137,15 @@ int main(int argc, char const *argv[])
         while ( line[x] && line[x] != '\n' )
           ++x;
 
+        /* If the line does not contains '\n',
+         * that is a last line of input and
+         * a next input will be EOF always. */
+        if (line[x] != '\n') {
+          finish_failure();
+          printf ("%s", line);
+          return 0;
+        }
+
         buffer[bufptr] = malloc(sizeof(char) * x);
         memcpy( buffer[bufptr], line, x );
         buffer[bufptr][x] = '\0';
