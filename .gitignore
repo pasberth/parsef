@@ -1,0 +1,6 @@
+.omakedb
+.omakedb.lock
+*.omc
+bin
+*.hi
+*.o
