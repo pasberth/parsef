@@ -1,4 +1,4 @@
-CC = /usr/bin/clang
+CC = clang
 HC = ghc
 BIN = $(absname bin)
 
