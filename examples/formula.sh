@@ -6,7 +6,7 @@ export FORMULAV="α β γ"
 expr ()                          \
   { echo "$@"                    \
   | split-on-spaces              \
-  | punctuation-mark '(' ')' '¬' \
+  | split-in-punctuation '(' ')' '¬' \
   | between '(' ')'              \
       eval 'foldr -@¬ formula "(¬ α)" ¬ α | formula "(∧ α β)" α ∧ β | formula "(∨ α β)" α ∨ β | foldr -@→ formula "(→ α β)" α → β ' \
   | foldr -@¬ formula "(¬ α)" ¬ α \

@@ -2,8 +2,8 @@ $(BIN)/split-on-spaces: split-on-spaces.sed
   mkdir -p $(BIN)
   install split-on-spaces.sed $(BIN)/split-on-spaces
 
-$(BIN)/punctuation-mark: punctuation-mark.pl
+$(BIN)/split-in-punctuation: split-in-punctuation.pl
   mkdir -p $(BIN)
-  install punctuation-mark.pl $(BIN)/punctuation-mark
+  install split-in-punctuation.pl $(BIN)/split-in-punctuation
 
-install: $(BIN)/split-on-spaces $(BIN)/punctuation-mark
+install: $(BIN)/split-on-spaces $(BIN)/split-in-punctuation
