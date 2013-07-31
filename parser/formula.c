@@ -25,16 +25,12 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
  * ================================================================================ */
 
 #define YLEN 256
-#define XLEN 2048
 
-static char buffered[YLEN];
-static char buffer[YLEN][XLEN];
+static char *buffer[YLEN];
 static char *variables[YLEN];
 
-static char ch;
 static int yfirst = 0;
 static int y = 0;
-static int x = 0;
 
 static inline void incr_yfirst() {
   if (yfirst + 1 < YLEN)
@@ -50,35 +46,33 @@ static inline void incr_y() {
     y = 0;
 }
 
-static inline void retry() {
-  buffered[yfirst] = 0;
-  printf ("%s\n", buffer[yfirst]);
+static inline void finish_line () {
+  if ( ! buffer[yfirst] )
+    return;
 
-  buffer[yfirst][0] = '\0';
+  free ( buffer[yfirst] );
+  buffer[yfirst] = NULL;
+
   incr_yfirst();
+}
+
+static inline void retry() {
+  if ( ! buffer[yfirst] )
+    return;
+
+  printf ( "%s\n", buffer[yfirst] );
+  finish_line();
   y = yfirst;
 }
 
 static inline void finish_finally() {
-  for (int j = 0; j < YLEN; ++j)
-  {
-    buffered[j] = 0;
-    buffer[j][0] = '\0';
-  }
-
   y      = 0;
   yfirst = 0;
 }
 
 static inline void finish_failure() {
   for (int j = 0; j < YLEN; ++j)
-  {
-    if (buffered[yfirst])
-      printf ("%s\n", buffer[yfirst]);
-    else
-      printf ("%s", buffer[yfirst]);
-    incr_yfirst();
-  }
+    retry();
 
   finish_finally();
 }
@@ -93,26 +87,13 @@ static inline void finish_success(const struct Format *format) {
 
     format = format->next;
   }
-  printf ("\n");
+
+  putchar ('\n');
+
+  for (int j = 0; j < YLEN; ++j)
+    finish_line();
 
   finish_finally();
-}
-
-static inline char getchar_from_stdin() {
-  ch = getchar();
-
-  if (ch == '\n') {
-    buffer[y][x] = '\0';
-    buffered[y] = 1;
-  } else if (ch == EOF) {
-    buffer[y][x] = '\0';
-    finish_failure();
-  } else {
-    buffer[y][x] = ch;
-    ++x;
-  }
-
-  return ch;
 }
 
 int main(int argc, char const *argv[])
@@ -131,24 +112,33 @@ int main(int argc, char const *argv[])
   const struct Format *formula = fmlparse(formulavlen, formulav, argc - 2, argv + 2);
   const struct Format *fml = formula;
 
+  char *line;
+  size_t len;
+
   while (1) {
+
     if (! fml) {
       fml = formula;
       finish_success(format);
       continue;
     }
 
-    x = 0;
+    if ( ! buffer[y] ) {
+      if ( getline( &line, &len, stdin ) == -1 ) {
+        finish_failure();
+        printf( "%s", line );
+        return 0;
+      } else {
 
-    if ( ! buffered[y] )
-      while (1) {
-        ch = getchar_from_stdin();
+        int x = 0; /* '\n' */
+        while ( line[x] && line[x] != '\n' )
+          ++x;
 
-        if (ch == '\n')
-          break;
-        else if (ch == EOF)
-          return 0;
+        buffer[y] = malloc(sizeof(char) * x);
+        memcpy( buffer[y], line, x );
+        buffer[y][x] = '\0';
       }
+    }
 
     if ( fml->type == Str ) {
       if ( strcmp(buffer[y], fml->str) ) {
