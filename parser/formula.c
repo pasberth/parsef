@@ -24,6 +24,12 @@ static const struct Format *fmlparse(int formulavlen, const char **formulav, int
  *   Main program
  * ================================================================================ */
 
+#define STATIC_BUFFER_YSIZE 256
+#define STATIC_BUFFER_XSIZE 2048
+
+static char static_buffer[STATIC_BUFFER_YSIZE][STATIC_BUFFER_XSIZE];
+static char static_buffered[STATIC_BUFFER_YSIZE];
+
 static int BUFSIZE;
 static char **buffer;
 static char *buffered;
@@ -148,9 +154,31 @@ int main(int argc, char const *argv[])
           return 0;
         }
 
-        buffer[bufptr] = realloc(buffer[bufptr], sizeof(char) * (x + 1));
-        memcpy( buffer[bufptr], line, x );
-        buffer[bufptr][x] = '\0';
+        char *buf;
+
+        if ( bufptr < STATIC_BUFFER_YSIZE && x + 1 < STATIC_BUFFER_XSIZE ) {
+          if ( ! static_buffered[bufptr] )
+            /* If buffer[y] is heap, I must free the heap. */
+            free ( buffer[bufptr] );
+            /* If buffer[y] is stack, I should fill up the buffer with 0
+              * but I don't, because now I'm no need. */
+
+          buf = static_buffer[bufptr];
+          static_buffered[bufptr] = 1;
+        } else {
+          if ( static_buffered[bufptr] )
+            /* If buffer[y] is stack, I can't use realloc() but I need to allocate a new heap. */
+            buf = malloc(sizeof(char) * (x + 1));
+          else
+            /* If buffer[y] is heap, I reallocate the heap by realloc(). */
+            buf = realloc(buffer[bufptr], sizeof(char) * (x + 1));
+
+          static_buffered[bufptr] = 0;
+        }
+
+        memcpy( buf, line, x );
+        buf[x] = '\0';
+        buffer[bufptr] = buf;
         buffered[bufptr] = 1;
       }
     }
