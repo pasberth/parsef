@@ -115,8 +115,8 @@ int main(int argc, char const *argv[])
   const struct Format *formula = fmlparse(formulavlen, formulav, BUFSIZE, FORMULA);
   const struct Format *fml = formula;
 
-  char *line;
-  size_t len;
+  static char *line;
+  static size_t len;
 
   while (1) {
 
