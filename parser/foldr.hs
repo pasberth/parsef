@@ -4,32 +4,28 @@ import System.Exit
 import System.Environment
 import System.Process
 
-getSepmarksByArgs :: [String] -> [String]
-getSepmarksByArgs (('-':'@':sepmark):args) = sepmark : getSepmarksByArgs args
-getSepmarksByArgs args                     = []
+data Args = Args {
+  sepmarks    :: [String]
+, commandName :: Maybe String
+, commandArgs :: [String]
+}
 
-getCommandNameByArgs :: [String] -> Maybe String
-getCommandNameByArgs (('-':'@':sepmark):args) = getCommandNameByArgs args
-getCommandNameByArgs (name:args)              = Just name
-getCommandNameByArgs []                       = Nothing
-
-getCommandArgsByArgs :: [String] -> [String]
-getCommandArgsByArgs (('-':'@':sepmark):args) = getCommandArgsByArgs args
-getCommandArgsByArgs (name:args)              = args
-getCommandArgsByArgs []                       = []
+parseArgs :: [String] -> Args
+parseArgs (('-':'@':sepmark):args) = let x = parseArgs args in x { sepmarks = sepmark : sepmarks x }
+parseArgs (name:args)              = let x = parseArgs args in x { commandName = Just name, commandArgs = args }
+parseArgs []                       = Args [] Nothing []
 
 main = do
-  args <- getArgs
+  args <- parseArgs <$> getArgs
+  let sepmarks' = sepmarks args
+  let cmdargs   = commandArgs args
   contents <- getContents 
-  let sepmarks = getSepmarksByArgs args
-  let command  = getCommandNameByArgs args
-  let cmdargs  = getCommandArgsByArgs args
 
-  case command of
+  case commandName args of
     Nothing -> exitFailure
     Just command -> do
       let exeproc  = readProcess command cmdargs
 
-      r <- foldrM (\l b -> if l `F.elem` sepmarks then (\b -> l : lines b) <$> exeproc (unlines b) else return (l:b)) [] (lines contents)
+      r <- foldrM (\l b -> if l `F.elem` sepmarks' then (\b -> l : lines b) <$> exeproc (unlines b) else return (l:b)) [] (lines contents)
       r <- exeproc (unlines r)
       putStr r
