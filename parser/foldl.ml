@@ -1,5 +1,4 @@
 open Unix
-open Printf
 
 let rec parse_args = function
   | [] -> ( [] , None, [] )
