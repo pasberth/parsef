@@ -1,4 +1,4 @@
-describe "foldr" do
+describe "foldl" do
 
   example do
     expect(`foldl cat -E <<< "a"`).to eq "a\$\n"
