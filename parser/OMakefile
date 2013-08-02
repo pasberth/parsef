@@ -2,16 +2,32 @@ CFLAGS += -Wall -O4 -std=c11
 
 CProgram(formula, formula)
 
+USE_OCAMLFIND = true
+
+OCAMLPACKS[] =
+  batteries
+
+if $(not $(OCAMLFIND_EXISTS))
+   eprintln(This project requires ocamlfind, but is was not found.)
+   eprintln(You need to install ocamlfind and run "omake --configure".)
+   exit 1
+
+NATIVE_ENABLED = $(OCAMLOPT_EXISTS)
+OCamlProgram(foldl, foldl)
+
 ../bin/formula: ../bin formula
   install formula ../bin/formula
 
 ../bin/foldr: ../bin foldr.hs
   $(HC) -O2 foldr.hs -o ../bin/foldr
 
+../bin/foldl: foldl
+  install foldl ../bin/foldl
+
 ../bin/between: ../bin between.zsh
   install between.zsh ../bin/between
 
-build: ../bin/formula ../bin/foldr ../bin/between
+build: ../bin/formula ../bin/foldr ../bin/foldl ../bin/between
 
 clean:
   rm -f formula
