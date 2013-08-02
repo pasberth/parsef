@@ -23,4 +23,13 @@ describe "formula" do
     example { expect(`formula "(append α β)" α ++ β <<< "x\n++"`).to eq "x\n++\n" }
     example { expect(`formula "(append α β)" α ++ β <<< "x\n++\ny"`).to eq "(append x y)\n" }
   end
+
+  context "when mixfix operator" do
+
+    example { expect(`formula "(if α β γ)" α "?" β : γ <<< "x"`).to eq "x\n" }
+    example { expect(`formula "(if α β γ)" α "?" β : γ <<< "x\n?"`).to eq "x\n?\n" }
+    example { expect(`formula "(if α β γ)" α "?" β : γ <<< "x\n?\ny"`).to eq "x\n?\ny\n" }
+    example { expect(`formula "(if α β γ)" α "?" β : γ <<< "x\n?\ny\n:"`).to eq "x\n?\ny\n:\n" }
+    example { expect(`formula "(if α β γ)" α "?" β : γ <<< "x\n?\ny\n:\nz"`).to eq "(if x y z)\n" }
+  end
 end
