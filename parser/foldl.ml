@@ -36,6 +36,7 @@ let () = match Array.to_list (Array.map BatString.to_list Sys.argv) with
         match !reading with (hin, hout, c) -> try while true do
           let l = input_line c in lines := l :: !lines
         done with End_of_file -> close_in c end;
+        match wait () with _ -> ();
         List.rev !lines in
 
       exeproc ();
